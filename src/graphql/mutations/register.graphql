@@ -10,16 +10,3 @@ mutation Register($username: String!, $password: String!) {
     }
   }
 }
-
-mutation Login($username: String!, $password: String!) {
-  login(options: { username: $username, password: $password }) {
-    user {
-      id
-      username
-    }
-    errors {
-      field
-      message
-    }
-  }
-}
