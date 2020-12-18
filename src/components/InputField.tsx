@@ -3,16 +3,16 @@ import { useField } from "formik";
 import { InputHTMLAttributes } from "react";
 
 // this is saying we want this component to take in any props that a regular input field would take
-type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & { name: string; label: string; placeholder: string; };
+type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & { name: string; label: string;};
 
-export const InputField: React.FC<InputFieldProps> = (props) => {
+// size: _ strips size out of props and renames it to _
+
+export const InputField: React.FC<InputFieldProps> = ({label, size: _, ...props}) => {
   const [field, {error}] = useField(props);
-  console.log('field: ', field);
-  console.log('props: ', props);
   return (
     <FormControl isInvalid={!!error}>
-      <FormLabel htmlFor={field.name}>{props.label}</FormLabel>
-      <Input {...field} id={field.name} placeholder={props.placeholder} />
+      <FormLabel htmlFor={field.name}>{label}</FormLabel>
+      <Input {...field} {...props} id={field.name} />
       {error && <FormErrorMessage>{error}</FormErrorMessage>}
     </FormControl>
   );
