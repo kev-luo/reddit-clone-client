@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { InputField } from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
 import { toErrorMap } from "../utils/toErrorMap";
+import { useLoginMutation } from "../generated/graphql";
 
 interface loginProps {
 
@@ -13,16 +14,21 @@ interface loginProps {
 
 const Login: React.FC<loginProps> = ({ }) => {
   const router = useRouter();
+  const [, login] = useLoginMutation();
   const initialValues = { username: "", password: "" };
 
-  const handleSubmit = async (values: { username: string; password: string; }) => {
-    console.log(values);
-    router.push("/login");
+  const handleSubmit = async (values: { username: string; password: string; }, setErrors: { (errors: FormikErrors<{ username: string; password: string; }>): void; (arg0: Record<string, string>): void; }) => {
+    const response = await login(values);
+    if(response.data?.login.errors) {
+      setErrors(toErrorMap(response.data.login.errors));
+    } else if(response.data?.login.user) {
+      router.push("/");
+    }
   }
 
   return (
     <Wrapper variant="small">
-      <Formik initialValues={initialValues} onSubmit={(values) => handleSubmit(values)}>
+      <Formik initialValues={initialValues} onSubmit={(values, { setErrors }) => handleSubmit(values, setErrors)}>
         {(props) => (
           <Form>
             <InputField name="username" label="Username"/>
