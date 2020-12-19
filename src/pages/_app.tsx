@@ -19,10 +19,11 @@ function betterUpdateQuery<Result, Query>(
 }
 
 const client = createClient({
-  url: "http://localhost:4000/graphql", fetchOptions: { credentials: "include" }, exchanges: [dedupExchange, fetchExchange, cacheExchange({
+  url: "http://localhost:4000/graphql", fetchOptions: { credentials: "include" }, exchanges: [dedupExchange, cacheExchange({
     updates: {
       Mutation: {
-        login: (_result, _, cache, _) => {
+        login: (_result, args, cache, info) => {
+          // we're updating the MeQuery and sticking the user in there
           betterUpdateQuery<LoginMutation, MeQuery>(
             cache,
             { query: MeDocument },
@@ -57,7 +58,7 @@ const client = createClient({
         }
       }
     }
-  })],
+  }), fetchExchange],
 })
 
 function MyApp({ Component, pageProps }: AppProps) {
