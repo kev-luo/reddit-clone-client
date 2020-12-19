@@ -1,0 +1,8 @@
+fragment UserResponseGroup on UserResponse {
+  user {
+    ...UserInput
+  }
+  errors {
+    ...UserError
+  }
+}

@@ -1,0 +1,5 @@
+mutation ChangePw($token: String!, $newPassword: String!) {
+  changePw(token: $token, newPassword: $newPassword) {
+    ...UserResponseGroup
+  }
+}
