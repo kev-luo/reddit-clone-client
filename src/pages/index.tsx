@@ -1,7 +1,6 @@
-import { DarkModeSwitch } from "../components/DarkModeSwitch";
 
 const Index = () => (
-  <div>Hello World <DarkModeSwitch /></div>
+  <div>Hello World</div>
 )
 
 export default Index
