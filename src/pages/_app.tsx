@@ -6,7 +6,7 @@ import { AppProps } from 'next/app'
 
 import theme from '../theme'
 import { Layout } from '../components/Layout';
-import { MeDocument } from '../generated/graphql';
+import { LoginMutation, MeDocument, MeQuery, RegisterMutation } from '../generated/graphql';
 
 // function to properly cast types
 function betterUpdateQuery<Result, Query>(
@@ -22,10 +22,38 @@ const client = createClient({
   url: "http://localhost:4000/graphql", fetchOptions: { credentials: "include" }, exchanges: [dedupExchange, fetchExchange, cacheExchange({
     updates: {
       Mutation: {
-        login: (result, args, cache, info) => {
-          cache.updateQuery({ query: MeDocument}, data => {
-            if(data) return data;
-          })
+        login: (_result, _, cache, _) => {
+          betterUpdateQuery<LoginMutation, MeQuery>(
+            cache,
+            { query: MeDocument },
+            _result,
+            (result, query) => {
+              if(result.login.errors) {
+                return query
+              } else {
+                return {
+                  // the return expects a user type due to our helper function
+                  me: result.login.user,
+                }
+              }
+            }
+          )
+        },
+        register: (_result, args, cache, info) => {
+          betterUpdateQuery<RegisterMutation, MeQuery>(
+            cache,
+            { query: MeDocument},
+            _result,
+            (result, query) => {
+              if(result.register.errors) {
+                return query;
+              } else {
+                return {
+                  me: result.register.user
+                }
+              }
+            }
+          )
         }
       }
     }
