@@ -9,6 +9,7 @@ export const DarkModeSwitch = () => {
       color="green"
       isChecked={isDark}
       onChange={toggleColorMode}
+      _focus={{boxShadow: "0px 0px 0px 0px black"}}
     />
   )
 }

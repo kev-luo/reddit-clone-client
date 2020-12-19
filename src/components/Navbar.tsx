@@ -1,4 +1,4 @@
-import { Box, Flex, Link } from "@chakra-ui/react";
+import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
 import { DarkModeSwitch } from "./DarkModeSwitch";
@@ -9,10 +9,13 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ }) => {
-  const [{ data }] = useMeQuery();
-  const links = data?.me ? (
-    <Box>{data?.me?.username}</Box>
-  ) : (
+  const [{ data, fetching }] = useMeQuery();
+  let body;
+
+  if (fetching) {
+    body = null;
+  } else if (!data?.me) {
+    body = (
       <>
         <NextLink href="/login" >
           <Link mr={2}>Login</Link>
@@ -22,12 +25,21 @@ export const Navbar: React.FC<NavbarProps> = ({ }) => {
         </NextLink>
       </>
     )
+  } else {
+    body = (
+      <>
+        <Box mr={2}>{data?.me?.username}</Box>
+        <Button variant="link">Logout</Button>
+      </>
+    )
+  }
+  
   return (
     <Flex bg="tomato" p={4}>
-      <Box ml={'auto'}>
-        {links}
+      <Flex ml={'auto'}>
+        {body}
         <DarkModeSwitch />
-      </Box>
+      </Flex>
     </Flex>
   );
 }
