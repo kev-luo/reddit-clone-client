@@ -17,10 +17,10 @@ interface loginProps {
 const Login: React.FC<loginProps> = ({ }) => {
   const router = useRouter();
   const [, login] = useLoginMutation();
-  const initialValues = { username: "", password: "" };
+  const initialValues = { usernameOrEmail: "", password: "" };
 
-  const handleSubmit = async (values: { username: string; password: string; }, setErrors: { (errors: FormikErrors<{ username: string; password: string; }>): void; (arg0: Record<string, string>): void; }) => {
-    const response = await login({ options: values });
+  const handleSubmit = async (values: { usernameOrEmail: string; password: string; }, setErrors: { (errors: FormikErrors<{ usernameOrEmail: string; password: string; }>): void; (arg0: Record<string, string>): void; }) => {
+    const response = await login(values);
     if (response.data?.login.errors) {
       setErrors(toErrorMap(response.data.login.errors));
     } else if (response.data?.login.user) {
@@ -34,7 +34,7 @@ const Login: React.FC<loginProps> = ({ }) => {
         <Formik initialValues={initialValues} onSubmit={(values, { setErrors }) => handleSubmit(values, setErrors)}>
           {(props) => (
             <Form>
-              <InputField name="username" label="Username" />
+              <InputField name="usernameOrEmail" label="Username or Email" />
               <InputField name="password" label="Password" type="password" />
               <Button type="submit" isLoading={props.isSubmitting}>Login</Button>
             </Form>

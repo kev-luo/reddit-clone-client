@@ -16,10 +16,10 @@ interface registerProps {
 const Register: React.FC<registerProps> = ({ }) => {
   const router = useRouter();
   const [, register] = useRegisterMutation()
-  const initialValues = { username: "", password: "" };
+  const initialValues = { username: "", email: "", password: "" };
 
-  const handleSubmit = async (values: { username: string; password: string; }, setErrors: { (errors: FormikErrors<{ username: string; password: string; }>): void; (arg0: Record<string, string>): void; }) => {
-    const response = await register(values)
+  const handleSubmit = async (values: { username: string; email: string, password: string; }, setErrors: { (errors: FormikErrors<{ username: string; email: string, password: string; }>): void; (arg0: Record<string, string>): void; }) => {
+    const response = await register({options: values})
     if(response.data?.register.errors) {
       setErrors(toErrorMap(response.data.register.errors))
     } else if(response.data?.register.user) {
@@ -33,6 +33,7 @@ const Register: React.FC<registerProps> = ({ }) => {
         {(props) => (
           <Form>
             <InputField name="username" label="Username" />
+            <InputField name="email" label="Email" />
             <InputField name="password" label="Password" type="password" />
             <Button type="submit" isLoading={props.isSubmitting}>Register</Button>
           </Form>
