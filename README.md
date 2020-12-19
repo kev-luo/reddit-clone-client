@@ -28,3 +28,4 @@ Steps
 8. update cache after mutation
 9. set up SSR for index page and disable for navbar displayed on index page
 10. set up forgot password utility with NodeMailer
+11. add create post form along with error handling if someone tries to post without being logged in
