@@ -6,7 +6,7 @@ import { AppProps } from 'next/app'
 
 import theme from '../theme'
 import { Layout } from '../components/Layout';
-import { LoginMutation, MeDocument, MeQuery, RegisterMutation } from '../generated/graphql';
+import { LoginMutation, LogoutMutation, MeDocument, MeQuery, RegisterMutation } from '../generated/graphql';
 
 // function to properly cast types
 function betterUpdateQuery<Result, Query>(
@@ -29,7 +29,7 @@ const client = createClient({
             { query: MeDocument },
             _result,
             (result, query) => {
-              if(result.login.errors) {
+              if (result.login.errors) {
                 return query
               } else {
                 return {
@@ -40,13 +40,21 @@ const client = createClient({
             }
           )
         },
+        logout: (_result, args, cache, info) => {
+          betterUpdateQuery<LogoutMutation, MeQuery>(
+            cache,
+            { query: MeDocument },
+            _result,
+            () => ({me: null})
+          )
+        },
         register: (_result, args, cache, info) => {
           betterUpdateQuery<RegisterMutation, MeQuery>(
             cache,
-            { query: MeDocument},
+            { query: MeDocument },
             _result,
             (result, query) => {
-              if(result.register.errors) {
+              if (result.register.errors) {
                 return query;
               } else {
                 return {

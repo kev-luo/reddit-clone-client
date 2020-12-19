@@ -1,4 +1,4 @@
-fragment RegularUser on User {
+fragment UserInput on User {
   id
   username
 }
