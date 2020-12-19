@@ -1,0 +1,3 @@
+mutation ForgotPw($email: String!) {
+  forgotPw(email: $email) 
+}

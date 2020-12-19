@@ -30,24 +30,22 @@ const Login: React.FC<loginProps> = ({ }) => {
   }
 
   return (
-    <>
-      <Wrapper variant="small">
-        <Formik initialValues={initialValues} onSubmit={(values, { setErrors }) => handleSubmit(values, setErrors)}>
-          {(props) => (
-            <Form>
-              <InputField name="usernameOrEmail" label="Username/Email" />
-              <InputField name="password" label="Password" type="password" />
-              <Flex my={2}>
-                <NextLink href="/forgot-password">
-                  <Link ml="auto">Forget Password?</Link>
-                </NextLink>
-              </Flex>
-              <Button type="submit" isLoading={props.isSubmitting}>Login</Button>
-            </Form>
-          )}
-        </Formik>
-      </Wrapper>
-    </>
+    <Wrapper variant="small">
+      <Formik initialValues={initialValues} onSubmit={(values, { setErrors }) => handleSubmit(values, setErrors)}>
+        {(props) => (
+          <Form>
+            <InputField name="usernameOrEmail" label="Username/Email" />
+            <InputField name="password" label="Password" type="password" />
+            <Flex my={2}>
+              <NextLink href="/forgot-password">
+                <Link ml="auto">Forget Password?</Link>
+              </NextLink>
+            </Flex>
+            <Button type="submit" isLoading={props.isSubmitting}>Login</Button>
+          </Form>
+        )}
+      </Formik>
+    </Wrapper>
   );
 }
 
