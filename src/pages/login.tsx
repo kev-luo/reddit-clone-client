@@ -1,8 +1,9 @@
 import React from "react";
 import { Formik, Form, FormikErrors } from "formik";
-import { Button } from "@chakra-ui/react";
+import { Button, Flex, Link } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { withUrqlClient } from "next-urql";
+import NextLink from "next/link";
 
 import { InputField } from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
@@ -34,8 +35,13 @@ const Login: React.FC<loginProps> = ({ }) => {
         <Formik initialValues={initialValues} onSubmit={(values, { setErrors }) => handleSubmit(values, setErrors)}>
           {(props) => (
             <Form>
-              <InputField name="usernameOrEmail" label="Username or Email" />
+              <InputField name="usernameOrEmail" label="Username/Email" />
               <InputField name="password" label="Password" type="password" />
+              <Flex my={2}>
+                <NextLink href="/forgot-password">
+                  <Link ml="auto">Forget Password?</Link>
+                </NextLink>
+              </Flex>
               <Button type="submit" isLoading={props.isSubmitting}>Login</Button>
             </Form>
           )}
