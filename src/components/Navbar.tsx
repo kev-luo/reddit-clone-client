@@ -1,17 +1,23 @@
 import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
+
 import { DarkModeSwitch } from "./DarkModeSwitch";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
+import { isServer } from "../utils/isServer";
 
 interface NavbarProps {
 
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ }) => {
-  const [{ data, fetching }] = useMeQuery();
+  // since we added the navbar to the index page which implements SSR, the navbar query is also sending the MeQuery to our Nextjs server where there is no cookie. this means the result will always be null
+  const [{ data, fetching }] = useMeQuery({
+    pause: isServer()
+  });
   const [{fetching: logoutFetching}, logout] = useLogoutMutation();
   let body;
+
 
   if (fetching) {
     body = null;
