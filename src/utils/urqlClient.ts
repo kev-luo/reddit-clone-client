@@ -1,4 +1,4 @@
-import { dedupExchange, fetchExchange, Exchange } from "urql"
+import { dedupExchange, fetchExchange, Exchange, stringifyVariables } from "urql"
 import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
 import { LoginMutation, MeQuery, MeDocument, LogoutMutation, RegisterMutation } from "../generated/graphql"
 import { betterUpdateQuery } from "./betterUpdateQuery";
@@ -23,7 +23,7 @@ const errorExchange: Exchange = ({ forward }) => (ops$) => {
 const cursorPagination = (): Resolver => {
   return (_parent, fieldArgs, cache, info) => {
     const { parentKey: entityKey, fieldName } = info;
-    
+
     // this will inspect all of a certain type of request in the cache. in this case it's inspecting all the queries in the cache since it was called by a client side query resolver.
     // allFields contains separates queries based on name and arguments
     const allFields = cache.inspectFields(entityKey);
@@ -34,14 +34,33 @@ const cursorPagination = (): Resolver => {
       return undefined;
     }
 
+    // when this is passed, urql is going to know we didn't pass through all the data so it's going to fetch the rest of the data from the server
+    const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`
+    const isInCache = cache.resolve(
+      cache.resolve(entityKey, fieldKey) as string,
+      "posts"
+    )
+    info.partial = !isInCache
+
     const results: string[] = [];
     // combining all queries of the same name but with different arguments (eg posts queries with different limit args combined into a single result)
+    let hasMore = true;
     fieldInfos.forEach(fieldInfo => {
-      const data = cache.resolve(entityKey, fieldInfo.fieldKey) as string[];
+      const key = cache.resolve(entityKey, fieldInfo.fieldKey) as string;
+      const data = cache.resolve(key, "posts") as string[];
+      const _hasMore = cache.resolve(key, "hasMore");
+      if (!_hasMore) {
+        hasMore = _hasMore as boolean;
+      }
       results.push(...data);
     })
-    return results;
-    
+    // returning results means there's data in the cache so we need to tell urql when to do a query
+    return {
+      __typename: "PaginatedPosts",
+      hasMore,
+      posts: results,
+    };
+
 
     // uneeded for now
     // const visited = new Set();
@@ -100,6 +119,9 @@ const cursorPagination = (): Resolver => {
 
 export const urqlClient = (ssrExchange: any) => ({
   url: "http://localhost:4000/graphql", fetchOptions: { credentials: "include" as const }, exchanges: [dedupExchange, cacheExchange({
+    keys: {
+      PaginatedPosts: () => null,
+    },
     resolvers: {
       Query: {
         // this is a client side resolver. cursorPagination() gets run whenever the posts query gets run
