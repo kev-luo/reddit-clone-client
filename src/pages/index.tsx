@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { withUrqlClient } from "next-urql"
-import { Link, Stack, Box, Heading, Text, Flex, Button } from "@chakra-ui/react";
+import { Link, Stack, Box, Heading, Text, Flex, Button, IconButton } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { BsTrash2 } from "react-icons/bs";
 
 import { Layout } from "../components/Layout";
-import { usePostsQuery } from "../generated/graphql";
+import { useDeletePostMutation, usePostsQuery } from "../generated/graphql";
 import { urqlClient } from "../utils/urqlClient"
 import { UpvoteSection } from "../components/UpvoteSection";
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string })
   const [{ data, fetching, stale }] = usePostsQuery({ variables });
+  const [, deletePost] = useDeletePostMutation();
 
   if (!fetching && !data) {
     return <div>Posts query wasn't able to retrieve the posts.</div>
@@ -29,17 +31,26 @@ const Index = () => {
         (
           <Stack>
             {data!.posts.posts.map(post => (
-              <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
-                <UpvoteSection post={post} />
-                <Box>
-                  <NextLink href="/post/[id]" as={`/post/${post.id}`}>
-                    <Link>
-                      <Heading fontSize="xl">{post.title}</Heading>
-                    </Link>
-                  </NextLink>
-                  <Text>OP: {post.author.username}</Text>
-                  <Text mt={4}>{post.textSnippet}</Text>
-                </Box>
+              <Flex key={post.id} p={5} shadow="md" borderWidth="1px" justifyContent="space-between">
+                <Flex>
+                  <UpvoteSection post={post} />
+                  <Box>
+                    <NextLink href="/post/[id]" as={`/post/${post.id}`}>
+                      <Link>
+                        <Heading fontSize="xl">{post.title}</Heading>
+                      </Link>
+                    </NextLink>
+                    <Text>OP: {post.author.username}</Text>
+                    <Text mt={4}>{post.textSnippet}</Text>
+                  </Box>
+                </Flex>
+                <IconButton
+                  aria-label="delete post"
+                  icon={<BsTrash2 />}
+                  size="xs"
+                  alignSelf="center"
+                  onClick={() => deletePost({ id: post.id })}
+                />
               </Flex>
             ))}
           </Stack>
