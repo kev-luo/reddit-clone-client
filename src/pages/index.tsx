@@ -30,7 +30,7 @@ const Index = () => {
           <Stack>
             {data!.posts.posts.map(post => (
               <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
-                <UpvoteSection points={post.points} />
+                <UpvoteSection post={post} />
                 <Box>
                   <Heading fontSize="xl">{post.title}</Heading>
                   <Text>OP: {post.author.username}</Text>

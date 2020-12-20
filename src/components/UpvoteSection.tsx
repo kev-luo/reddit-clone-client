@@ -1,10 +1,10 @@
 import React from "react";
 import { Flex, IconButton } from "@chakra-ui/react";
 import { BsChevronUp, BsChevronDown } from "react-icons/bs";
-import { PostsQuery } from "../generated/graphql";
+import { PostSnippetFragment } from "../generated/graphql";
 
 interface UpvoteSectionProps {
-  post: PostsQuery["posts"]["posts"][0];
+  post: PostSnippetFragment
 }
 
 export const UpvoteSection: React.FC<UpvoteSectionProps> = ({ post }) => {
