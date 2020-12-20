@@ -18,16 +18,28 @@ export const UpvoteSection: React.FC<UpvoteSectionProps> = ({ post }) => {
     >
       <IconButton
         aria-label="upvote"
+        colorScheme={post.voteStatus === 1 ? "green" : undefined}
         icon={<BsChevronUp />}
         size="xs"
-        onClick={() => vote({ postId: post.id, value: 1 })}
+        onClick={() => {
+          if(post.voteStatus === 1) {
+            return;
+          }
+          vote({ postId: post.id, value: 1 })
+        }}
       />
       {post.points}
       <IconButton
         aria-label="downvote"
+        colorScheme={post.voteStatus === -1 ? "red" : undefined}
         icon={<BsChevronDown />}
         size="xs"
-        onClick={() => vote({ postId: post.id, value: -1 })}
+        onClick={() => {
+          if(post.voteStatus === -1) {
+            return;
+          }
+          vote({ postId: post.id, value: -1 })
+        }}
       />
     </Flex>
   );

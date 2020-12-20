@@ -35,3 +35,4 @@ Steps
 15. invalidate the posts query to refetch all posts from server instead of cache when you post to prevent race-conditions 
 16. add voting functionality
 17. update cache after voting by reading and writing post fragments
+18. query for vote status and read from readFragment
