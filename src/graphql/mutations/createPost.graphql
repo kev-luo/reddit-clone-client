@@ -1,7 +1,5 @@
 mutation CreatePost($input: PostInput!) {
-  createPost(
-    input: $input
-  ) {
+  createPost(input: $input) {
     id
     createdAt
     updatedAt

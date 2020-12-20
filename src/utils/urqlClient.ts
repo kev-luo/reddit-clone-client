@@ -1,10 +1,11 @@
-import { dedupExchange, fetchExchange, Exchange, stringifyVariables } from "urql"
-import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
-import { LoginMutation, MeQuery, MeDocument, LogoutMutation, RegisterMutation, VoteMutationVariables } from "../generated/graphql"
-import { betterUpdateQuery } from "./betterUpdateQuery";
-import { pipe, tap } from "wonka";
-import Router from "next/router";
 import { gql } from "@urql/core";
+import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
+import Router from "next/router";
+import { dedupExchange, Exchange, fetchExchange, stringifyVariables } from "urql";
+import { pipe, tap } from "wonka";
+import { LoginMutation, LogoutMutation, MeDocument, MeQuery, RegisterMutation, VoteMutationVariables } from "../generated/graphql";
+import { betterUpdateQuery } from "./betterUpdateQuery";
+import { isServer } from "./isServer";
 
 // global error handler
 const errorExchange: Exchange = ({ forward }) => (ops$) => {
@@ -118,8 +119,21 @@ const cursorPagination = (): Resolver => {
   };
 };
 
-export const urqlClient = (ssrExchange: any) => ({
-  url: "http://localhost:4000/graphql", fetchOptions: { credentials: "include" as const }, exchanges: [dedupExchange, cacheExchange({
+export const urqlClient = (ssrExchange: any, ctx: any) => ({
+  url: "http://localhost:4000/graphql",
+  fetchOptions: () => {
+    let cookie = "";
+    if (isServer()) {
+      cookie = ctx.req.headers.cookie;
+    }
+    return {
+      credentials: "include" as const,
+      headers: cookie ? {
+        cookie
+      } : undefined
+    }
+  },
+  exchanges: [dedupExchange, cacheExchange({
     keys: {
       PaginatedPosts: () => null,
     },
@@ -194,7 +208,7 @@ export const urqlClient = (ssrExchange: any) => ({
           `, { id: postId })
           // if there is data from the cache
           if (data) {
-            if(data.voteStatus === value) {
+            if (data.voteStatus === value) {
               return;
             }
             const newPoints = (data.points as number) + (data.voteStatus ? 2 : 1) * value
