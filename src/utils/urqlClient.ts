@@ -3,7 +3,7 @@ import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
 import Router from "next/router";
 import { dedupExchange, Exchange, fetchExchange, stringifyVariables } from "urql";
 import { pipe, tap } from "wonka";
-import { LoginMutation, LogoutMutation, MeDocument, MeQuery, RegisterMutation, VoteMutationVariables } from "../generated/graphql";
+import { DeletePostMutationVariables, LoginMutation, LogoutMutation, MeDocument, MeQuery, RegisterMutation, VoteMutationVariables } from "../generated/graphql";
 import { betterUpdateQuery } from "./betterUpdateQuery";
 import { isServer } from "./isServer";
 
@@ -145,7 +145,7 @@ export const urqlClient = (ssrExchange: any, ctx: any) => ({
     },
     updates: {
       Mutation: {
-        login: (_result, args, cache, info) => {
+        login: (_result, _args, cache, _info) => {
           // we're updating the MeQuery and sticking the user in there
           betterUpdateQuery<LoginMutation, MeQuery>(
             cache,
@@ -163,7 +163,7 @@ export const urqlClient = (ssrExchange: any, ctx: any) => ({
             }
           )
         },
-        logout: (_result, args, cache, info) => {
+        logout: (_result, _args, cache, _info) => {
           betterUpdateQuery<LogoutMutation, MeQuery>(
             cache,
             { query: MeDocument },
@@ -171,7 +171,7 @@ export const urqlClient = (ssrExchange: any, ctx: any) => ({
             () => ({ me: null })
           )
         },
-        register: (_result, args, cache, info) => {
+        register: (_result, _args, cache, _info) => {
           betterUpdateQuery<RegisterMutation, MeQuery>(
             cache,
             { query: MeDocument },
@@ -187,7 +187,7 @@ export const urqlClient = (ssrExchange: any, ctx: any) => ({
             }
           )
         },
-        createPost: (_result, args, cache, info) => {
+        createPost: (_result, _args, cache, _info) => {
           const allFields = cache.inspectFields("Query");
           const fieldInfos = allFields.filter(info => info.fieldName === "posts");
           fieldInfos.forEach((fieldInfo) => {
@@ -195,7 +195,7 @@ export const urqlClient = (ssrExchange: any, ctx: any) => ({
             cache.invalidate("Query", "posts", fieldInfo.arguments || {})
           })
         },
-        vote: (_result, args, cache, info) => {
+        vote: (_result, args, cache, _info) => {
           // get type information
           const { postId, value } = args as VoteMutationVariables
           // posts with correct postId will be updated wherever they're displayed
@@ -223,6 +223,11 @@ export const urqlClient = (ssrExchange: any, ctx: any) => ({
               { id: postId, points: newPoints, voteStatus: value }
             )
           }
+        },
+        // returns null for post that got deleted, therefore added a ternary in homepage in the map fxn to check if each post in the posts array contains a post.
+        deletePost: (_result, args, cache, _info) => {
+          const { id } = args as DeletePostMutationVariables
+          cache.invalidate({ __typename: "Post", id })
         }
       }
     }

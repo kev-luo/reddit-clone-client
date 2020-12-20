@@ -30,29 +30,32 @@ const Index = () => {
       {!data && fetching ? <div>Loading...</div> :
         (
           <Stack>
-            {data!.posts.posts.map(post => (
-              <Flex key={post.id} p={5} shadow="md" borderWidth="1px" justifyContent="space-between">
-                <Flex>
-                  <UpvoteSection post={post} />
-                  <Box>
-                    <NextLink href="/post/[id]" as={`/post/${post.id}`}>
-                      <Link>
-                        <Heading fontSize="xl">{post.title}</Heading>
-                      </Link>
-                    </NextLink>
-                    <Text>OP: {post.author.username}</Text>
-                    <Text mt={4}>{post.textSnippet}</Text>
-                  </Box>
+            {data!.posts.posts.map(post => {
+              return post ? (
+                <Flex key={post.id} p={5} shadow="md" borderWidth="1px" justifyContent="space-between">
+                  <Flex>
+                    <UpvoteSection post={post} />
+                    <Box>
+                      <NextLink href="/post/[id]" as={`/post/${post.id}`}>
+                        <Link>
+                          <Heading fontSize="xl">{post.title}</Heading>
+                        </Link>
+                      </NextLink>
+                      <Text>OP: {post.author.username}</Text>
+                      <Text mt={4}>{post.textSnippet}</Text>
+                    </Box>
+                  </Flex>
+                  <IconButton
+                    aria-label="delete post"
+                    icon={<BsTrash2 />}
+                    size="xs"
+                    alignSelf="center"
+                    onClick={() => deletePost({ id: post.id })}
+                  />
                 </Flex>
-                <IconButton
-                  aria-label="delete post"
-                  icon={<BsTrash2 />}
-                  size="xs"
-                  alignSelf="center"
-                  onClick={() => deletePost({ id: post.id })}
-                />
-              </Flex>
-            ))}
+              ) : null
+            }
+            )}
           </Stack>
         )}
       {data && data.posts.hasMore && (
