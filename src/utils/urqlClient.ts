@@ -1,9 +1,10 @@
 import { dedupExchange, fetchExchange, Exchange, stringifyVariables } from "urql"
 import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
-import { LoginMutation, MeQuery, MeDocument, LogoutMutation, RegisterMutation } from "../generated/graphql"
+import { LoginMutation, MeQuery, MeDocument, LogoutMutation, RegisterMutation, VoteMutationVariables } from "../generated/graphql"
 import { betterUpdateQuery } from "./betterUpdateQuery";
 import { pipe, tap } from "wonka";
 import Router from "next/router";
+import { gql } from "@urql/core";
 
 // global error handler
 const errorExchange: Exchange = ({ forward }) => (ops$) => {
@@ -179,6 +180,29 @@ export const urqlClient = (ssrExchange: any) => ({
             // invalidate cache and refetch posts
             cache.invalidate("Query", "posts", fieldInfo.arguments || {})
           })
+        },
+        vote: (_result, args, cache, info) => {
+          // get type information
+          const { postId, value } = args as VoteMutationVariables
+          // posts with correct postId will be updated wherever they're displayed
+          const data = cache.readFragment(gql`
+            fragment _ on Post {
+              id
+              points
+            }
+          `, { id: postId })
+          // if there is data from the cache
+          if (data) {      
+            const newPoints = (data.points as number) + (2*value);      
+            cache.writeFragment(
+              gql`
+                fragment __ on Post {
+                  points
+                }
+              `,
+              { id: postId, points: newPoints }
+            )
+          }
         }
       }
     }
