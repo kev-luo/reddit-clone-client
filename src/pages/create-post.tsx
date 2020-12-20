@@ -1,24 +1,18 @@
 import { Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import React, { useEffect } from "react";
-import { InputField } from "../components/InputField";
-import { useCreatePostMutation, useMeQuery } from "../generated/graphql";
-import { useRouter } from "next/router";
 import { withUrqlClient } from "next-urql";
-import { urqlClient } from "../utils/urqlClient";
+import { useRouter } from "next/router";
+import React from "react";
+import { InputField } from "../components/InputField";
 import { Layout } from "../components/Layout";
+import { useCreatePostMutation } from "../generated/graphql";
+import { urqlClient } from "../utils/urqlClient";
+import { useAuth } from "../utils/useAuth";
 
 
 const CreatePost: React.FC<{}> = ({ }) => {
-  const [{ data, fetching }] = useMeQuery();
   const router = useRouter();
-  
-  useEffect(() => {
-    if(!fetching && !data?.me) {
-      router.replace("/login");
-    }
-  }, [fetching, data, router])
-
+  useAuth();
   const [, createPost] = useCreatePostMutation();
   const initialValues = {title: "", text: ""}
   return (
