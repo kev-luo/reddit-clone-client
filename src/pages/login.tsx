@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, Form, FormikErrors } from "formik";
+import { Formik, Form } from "formik";
 import { Button, Flex, Link } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { withUrqlClient } from "next-urql";
@@ -20,18 +20,20 @@ const Login: React.FC<loginProps> = ({ }) => {
   const [, login] = useLoginMutation();
   const initialValues = { usernameOrEmail: "", password: "" };
 
-  const handleSubmit = async (values: { usernameOrEmail: string; password: string; }, setErrors: { (errors: FormikErrors<{ usernameOrEmail: string; password: string; }>): void; (arg0: Record<string, string>): void; }) => {
-    const response = await login(values);
-    if (response.data?.login.errors) {
-      setErrors(toErrorMap(response.data.login.errors));
-    } else if (response.data?.login.user) {
-      router.push("/");
-    }
-  }
-
   return (
     <Wrapper variant="small">
-      <Formik initialValues={initialValues} onSubmit={(values, { setErrors }) => handleSubmit(values, setErrors)}>
+      <Formik initialValues={initialValues} onSubmit={async (values, { setErrors }) => {
+        const response = await login(values);
+        if (response.data?.login.errors) {
+          setErrors(toErrorMap(response.data.login.errors));
+        } else if (response.data?.login.user) {
+          if(typeof router.query.next === "string") {
+            router.push(`${router.query.next}`);
+          } else {
+            router.push("/");
+          }
+        }
+      }}>
         {(props) => (
           <Form>
             <InputField name="usernameOrEmail" label="Username/Email" />
