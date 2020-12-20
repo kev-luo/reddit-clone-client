@@ -9,19 +9,19 @@ import { urqlClient } from "../utils/urqlClient"
 import { UpvoteSection } from "../components/UpvoteSection";
 
 const Index = () => {
-  const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string})
-  const [{ data, fetching, stale }] = usePostsQuery({variables});
+  const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string })
+  const [{ data, fetching, stale }] = usePostsQuery({ variables });
 
-  if(!fetching && !data) {
+  if (!fetching && !data) {
     return <div>Posts query wasn't able to retrieve the posts.</div>
   }
 
   return (
     <Layout>
       <Flex justifyContent="space-between" alignItems="flex-end">
-        <Heading>Reddit Clone</Heading>
+        <Heading>Feed</Heading>
         <NextLink href="/create-post">
-          <Link>Create Post</Link>
+          <Button as={Link}>Create Post</Button>
         </NextLink>
       </Flex>
       <br />
@@ -32,7 +32,11 @@ const Index = () => {
               <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
                 <UpvoteSection post={post} />
                 <Box>
-                  <Heading fontSize="xl">{post.title}</Heading>
+                  <NextLink href="/post/[id]" as={`/post/${post.id}`}>
+                    <Link>
+                      <Heading fontSize="xl">{post.title}</Heading>
+                    </Link>
+                  </NextLink>
                   <Text>OP: {post.author.username}</Text>
                   <Text mt={4}>{post.textSnippet}</Text>
                 </Box>

@@ -46,7 +46,7 @@ export type Post = {
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   title: Scalars['String'];
-  creatorId: Scalars['Float'];
+  authorId: Scalars['Float'];
   text: Scalars['String'];
   points: Scalars['Float'];
   voteStatus?: Maybe<Scalars['Int']>;
@@ -196,7 +196,7 @@ export type CreatePostMutation = (
   { __typename?: 'Mutation' }
   & { createPost: (
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'text' | 'points' | 'creatorId'>
+    & Pick<Post, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'text' | 'points' | 'authorId'>
   ) }
 );
 
@@ -357,7 +357,7 @@ export const CreatePostDocument = gql`
     title
     text
     points
-    creatorId
+    authorId
   }
 }
     `;
