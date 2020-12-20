@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { withUrqlClient } from "next-urql"
 import { Link, Stack, Box, Heading, Text, Flex, Button, IconButton } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { BsTrash2 } from "react-icons/bs";
+import { BsTrash2, BsPencilSquare } from "react-icons/bs";
 
 import { Layout } from "../components/Layout";
 import { useDeletePostMutation, usePostsQuery } from "../generated/graphql";
@@ -45,13 +45,18 @@ const Index = () => {
                       <Text mt={4}>{post.textSnippet}</Text>
                     </Box>
                   </Flex>
-                  <IconButton
-                    aria-label="delete post"
-                    icon={<BsTrash2 />}
-                    size="xs"
-                    alignSelf="center"
-                    onClick={() => deletePost({ id: post.id })}
-                  />
+                  <Flex alignSelf="center">
+                    <NextLink href="/post/edit/[id]" as={`/post/edit/${post.id}`}>
+                      <IconButton aria-label="edit post" icon={<BsPencilSquare />} size="sm" mr={2}/>
+                    </NextLink>
+                    <IconButton
+                      aria-label="delete post"
+                      icon={<BsTrash2 />}
+                      size="sm"
+                      onClick={() => deletePost({ id: post.id })}
+                    />
+                  </Flex>
+
                 </Flex>
               ) : null
             }
