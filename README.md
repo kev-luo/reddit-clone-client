@@ -32,3 +32,4 @@ Steps
 12. redirect non-logged in users when they visit create post page
 13. redirect user back to the page they were on before being redirected to the login page
 14. add pagination to posts query
+15. invalidate the posts query to refetch all posts from server instead of cache when you post to prevent race-conditions 

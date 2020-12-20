@@ -6,6 +6,7 @@ import NextLink from "next/link";
 import { Layout } from "../components/Layout";
 import { usePostsQuery } from "../generated/graphql";
 import { urqlClient } from "../utils/urqlClient"
+import { UpvoteSection } from "../components/UpvoteSection";
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string})
@@ -28,11 +29,14 @@ const Index = () => {
         (
           <Stack>
             {data!.posts.posts.map(post => (
-              <Box key={post.id} p={5} shadow="md" borderWidth="1px">
-                <Heading fontSize="xl">{post.title}</Heading>
-                <Text>OP: {post.author.username}</Text>
-                <Text mt={4}>{post.textSnippet}</Text>
-              </Box>
+              <Flex key={post.id} p={5} shadow="md" borderWidth="1px">
+                <UpvoteSection points={post.points} />
+                <Box>
+                  <Heading fontSize="xl">{post.title}</Heading>
+                  <Text>OP: {post.author.username}</Text>
+                  <Text mt={4}>{post.textSnippet}</Text>
+                </Box>
+              </Flex>
             ))}
           </Stack>
         )}
