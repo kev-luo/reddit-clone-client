@@ -31,3 +31,4 @@ Steps
 11. add create post form along with error handling if someone tries to post without being logged in
 12. redirect non-logged in users when they visit create post page
 13. redirect user back to the page they were on before being redirected to the login page
+14. add pagination to posts query
