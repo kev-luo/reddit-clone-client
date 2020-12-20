@@ -171,6 +171,16 @@ export const urqlClient = (ssrExchange: any) => ({
               }
             }
           )
+        },
+        createPost: (_result, args, cache, info) => {
+          // invalidate cache and refetch posts
+          console.log(cache.inspectFields("Query"));
+          
+          cache.invalidate("Query", "posts", {
+            limit: 10,
+          })
+          console.log(cache.inspectFields("Query"));
+          
         }
       }
     }

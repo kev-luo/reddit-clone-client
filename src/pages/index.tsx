@@ -9,7 +9,7 @@ import { urqlClient } from "../utils/urqlClient"
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string})
-  const [{ data, fetching }] = usePostsQuery({variables});
+  const [{ data, fetching, stale }] = usePostsQuery({variables});
 
   if(!fetching && !data) {
     return <div>Posts query wasn't able to retrieve the posts.</div>
@@ -30,6 +30,7 @@ const Index = () => {
             {data!.posts.posts.map(post => (
               <Box key={post.id} p={5} shadow="md" borderWidth="1px">
                 <Heading fontSize="xl">{post.title}</Heading>
+                <Text>OP: {post.author.username}</Text>
                 <Text mt={4}>{post.textSnippet}</Text>
               </Box>
             ))}
@@ -37,7 +38,7 @@ const Index = () => {
         )}
       {data && data.posts.hasMore && (
         <Flex justifyContent="center">
-          <Button isLoading={fetching} my={8} onClick={() => {
+          <Button isLoading={stale} my={8} onClick={() => {
             setVariables({
               ...variables,
               cursor: data.posts.posts[data.posts.posts.length - 1].createdAt
