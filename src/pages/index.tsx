@@ -5,13 +5,12 @@ import React, { useState } from "react";
 import { EditDeletePostBtns } from "../components/EditDeletePostBtns";
 import { Layout } from "../components/Layout";
 import { UpvoteSection } from "../components/UpvoteSection";
-import { useMeQuery, usePostsQuery } from "../generated/graphql";
+import { usePostsQuery } from "../generated/graphql";
 import { urqlClient } from "../utils/urqlClient";
 
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string })
-  const [{ data: meData }] = useMeQuery();
   const [{ data, fetching, stale }] = usePostsQuery({ variables });
 
   if (!fetching && !data) {
@@ -45,7 +44,7 @@ const Index = () => {
                       <Text mt={4}>{post.textSnippet}</Text>
                     </Box>
                   </Flex>
-                  {meData?.me?.id === post.author.id && <EditDeletePostBtns id={post.id} />}
+                  <EditDeletePostBtns id={post.id} authorId={post.author.id}/>
                 </Flex>
               ) : null
             }
