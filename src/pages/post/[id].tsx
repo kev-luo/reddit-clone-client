@@ -1,32 +1,22 @@
 import React from "react";
 import { withUrqlClient } from "next-urql";
 import { urqlClient } from "../../utils/urqlClient";
-import { useRouter } from "next/router";
-import { usePostQuery } from "../../generated/graphql";
 import { Layout } from "../../components/Layout";
 import { Box, Heading } from "@chakra-ui/react";
+import { useQueryParams } from "../../utils/useQueryParams";
+import { usePostQuery } from "../../generated/graphql";
 
 const Post = ({ }) => {
-  const router = useRouter();
-  const intId = typeof router.query.id === "string" ? parseInt(router.query.id) : -1
   const [{ data, fetching, error }] = usePostQuery({
-    pause: intId === -1,
+    pause: useQueryParams() === -1,
     variables: {
-      id: intId
+      id: useQueryParams()
     }
   });
 
-  if (fetching) {
-    return <Layout>Loading...</Layout>
-  }
-
-  if (error) {
-    return <Layout>{error.message}</Layout>
-  }
-
-  if (!data?.post) {
-    return <Layout>Could not find posts.</Layout>
-  }
+  if (fetching) return <Layout>Loading...</Layout>
+  if (error) return <Layout>{error.message}</Layout>
+  if (!data?.post) return <Layout>Could not find posts.</Layout>
 
   return (
     <Layout>
