@@ -46,4 +46,7 @@ Steps
 17. update cache after voting by reading and writing post fragments
 18. query for vote status and read from readFragment
 19. create single post page
-20. invalidate single elements from cache
+20. create delete post functionality
+21. invalidate single elements from cache for deleting posts
+22. create update post page
+23. 

@@ -5,12 +5,13 @@ import NextLink from "next/link";
 import { BsTrash2, BsPencilSquare } from "react-icons/bs";
 
 import { Layout } from "../components/Layout";
-import { useDeletePostMutation, usePostsQuery } from "../generated/graphql";
+import { useDeletePostMutation, useMeQuery, usePostsQuery } from "../generated/graphql";
 import { urqlClient } from "../utils/urqlClient"
 import { UpvoteSection } from "../components/UpvoteSection";
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string })
+  const [{ data: meData }] = useMeQuery();
   const [{ data, fetching, stale }] = usePostsQuery({ variables });
   const [, deletePost] = useDeletePostMutation();
 
@@ -45,18 +46,19 @@ const Index = () => {
                       <Text mt={4}>{post.textSnippet}</Text>
                     </Box>
                   </Flex>
-                  <Flex alignSelf="center">
-                    <NextLink href="/post/edit/[id]" as={`/post/edit/${post.id}`}>
-                      <IconButton aria-label="edit post" icon={<BsPencilSquare />} size="sm" mr={2}/>
-                    </NextLink>
-                    <IconButton
-                      aria-label="delete post"
-                      icon={<BsTrash2 />}
-                      size="sm"
-                      onClick={() => deletePost({ id: post.id })}
-                    />
-                  </Flex>
-
+                  {meData?.me?.id === post.author.id && (
+                    <Flex alignSelf="center">
+                      <NextLink href="/post/edit/[id]" as={`/post/edit/${post.id}`}>
+                        <IconButton aria-label="edit post" icon={<BsPencilSquare />} size="sm" mr={2} />
+                      </NextLink>
+                      <IconButton
+                        aria-label="delete post"
+                        icon={<BsTrash2 />}
+                        size="sm"
+                        onClick={() => deletePost({ id: post.id })}
+                      />
+                    </Flex>
+                  )}
                 </Flex>
               ) : null
             }
