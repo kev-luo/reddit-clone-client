@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import { withUrqlClient } from "next-urql"
-import { Link, Stack, Box, Heading, Text, Flex, Button, IconButton } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Link, Stack, Text } from "@chakra-ui/react";
+import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
-import { BsTrash2, BsPencilSquare } from "react-icons/bs";
-
+import React, { useState } from "react";
+import { EditDeletePostBtns } from "../components/EditDeletePostBtns";
 import { Layout } from "../components/Layout";
-import { useDeletePostMutation, useMeQuery, usePostsQuery } from "../generated/graphql";
-import { urqlClient } from "../utils/urqlClient"
 import { UpvoteSection } from "../components/UpvoteSection";
+import { useMeQuery, usePostsQuery } from "../generated/graphql";
+import { urqlClient } from "../utils/urqlClient";
+
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string })
   const [{ data: meData }] = useMeQuery();
   const [{ data, fetching, stale }] = usePostsQuery({ variables });
-  const [, deletePost] = useDeletePostMutation();
 
   if (!fetching && !data) {
     return <div>Posts query wasn't able to retrieve the posts.</div>
@@ -46,19 +45,7 @@ const Index = () => {
                       <Text mt={4}>{post.textSnippet}</Text>
                     </Box>
                   </Flex>
-                  {meData?.me?.id === post.author.id && (
-                    <Flex alignSelf="center">
-                      <NextLink href="/post/edit/[id]" as={`/post/edit/${post.id}`}>
-                        <IconButton aria-label="edit post" icon={<BsPencilSquare />} size="sm" mr={2} />
-                      </NextLink>
-                      <IconButton
-                        aria-label="delete post"
-                        icon={<BsTrash2 />}
-                        size="sm"
-                        onClick={() => deletePost({ id: post.id })}
-                      />
-                    </Flex>
-                  )}
+                  {meData?.me?.id === post.author.id && <EditDeletePostBtns id={post.id} />}
                 </Flex>
               ) : null
             }

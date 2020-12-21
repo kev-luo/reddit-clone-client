@@ -2,11 +2,13 @@ import React from "react";
 import { withUrqlClient } from "next-urql";
 import { urqlClient } from "../../utils/urqlClient";
 import { Layout } from "../../components/Layout";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Flex, Heading } from "@chakra-ui/react";
 import { useQueryParams } from "../../utils/useQueryParams";
-import { usePostQuery } from "../../generated/graphql";
+import { useMeQuery, usePostQuery } from "../../generated/graphql";
+import { EditDeletePostBtns } from "../../components/EditDeletePostBtns";
 
 const Post = ({ }) => {
+  const [{ data: meData }] = useMeQuery();
   const [{ data, fetching, error }] = usePostQuery({
     pause: useQueryParams() === -1,
     variables: {
@@ -20,9 +22,12 @@ const Post = ({ }) => {
 
   return (
     <Layout>
-      <Heading>
-        {data.post.title}
-      </Heading>
+      <Flex justifyContent="space-between">
+        <Heading>
+          {data.post.title}
+        </Heading>
+        {meData?.me?.id === data.post.author.id && <EditDeletePostBtns id={data.post.id} />}
+      </Flex>
       <Box>
         {data.post.text}
       </Box>

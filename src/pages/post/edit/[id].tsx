@@ -34,7 +34,7 @@ const EditPost = ({ }) => {
           id: intId,
           ...values
         })
-        router.push("/");
+        router.back();
       }}>
         {(props) => (
           <Form>
