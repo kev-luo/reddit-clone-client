@@ -1,5 +1,5 @@
 import { gql } from "@urql/core";
-import { cacheExchange, Resolver } from "@urql/exchange-graphcache";
+import { cacheExchange, Resolver, Cache } from "@urql/exchange-graphcache";
 import Router from "next/router";
 import { dedupExchange, Exchange, fetchExchange, stringifyVariables } from "urql";
 import { pipe, tap } from "wonka";
@@ -62,62 +62,17 @@ const cursorPagination = (): Resolver => {
       hasMore,
       posts: results,
     };
-
-
-    // uneeded for now
-    // const visited = new Set();
-    // let result: NullArray<string> = [];
-    // let prevOffset: number | null = null;
-
-    // for (let i = 0; i < size; i++) {
-    //   const { fieldKey, arguments: args } = fieldInfos[i];
-    //   if (args === null || !compareArgs(fieldArgs, args)) {
-    //     continue;
-    //   }
-
-    //   const links = cache.resolve(entityKey, fieldKey) as string[];
-    //   const currentOffset = args[cursorArgument];
-
-    //   if (
-    //     links === null ||
-    //     links.length === 0 ||
-    //     typeof currentOffset !== 'number'
-    //   ) {
-    //     continue;
-    //   }
-
-    //   const tempResult: NullArray<string> = [];
-
-    //   for (let j = 0; j < links.length; j++) {
-    //     const link = links[j];
-    //     if (visited.has(link)) continue;
-    //     tempResult.push(link);
-    //     visited.add(link);
-    //   }
-
-    //   if (
-    //     (!prevOffset || currentOffset > prevOffset) ===
-    //     (mergeMode === 'after')
-    //   ) {
-    //     result = [...result, ...tempResult];
-    //   } else {
-    //     result = [...tempResult, ...result];
-    //   }
-
-    //   prevOffset = currentOffset;
-    // }
-
-    // const hasCurrentPage = cache.resolve(entityKey, fieldName, fieldArgs);
-    // if (hasCurrentPage) {
-    //   return result;
-    // } else if (!(info as any).store.schema) {
-    //   return undefined;
-    // } else {
-    //   info.partial = true;
-    //   return result;
-    // }
   };
 };
+
+const invalidateAllPosts = (cache: Cache) => {
+  const allFields = cache.inspectFields("Query");
+  const fieldInfos = allFields.filter(info => info.fieldName === "posts");
+  fieldInfos.forEach((fieldInfo) => {
+    // invalidate cache and refetch posts
+    cache.invalidate("Query", "posts", fieldInfo.arguments || {})
+  })
+}
 
 export const urqlClient = (ssrExchange: any, ctx: any) => ({
   url: "http://localhost:4000/graphql",
@@ -162,6 +117,7 @@ export const urqlClient = (ssrExchange: any, ctx: any) => ({
               }
             }
           )
+          invalidateAllPosts(cache);
         },
         logout: (_result, _args, cache, _info) => {
           betterUpdateQuery<LogoutMutation, MeQuery>(
@@ -188,12 +144,7 @@ export const urqlClient = (ssrExchange: any, ctx: any) => ({
           )
         },
         createPost: (_result, _args, cache, _info) => {
-          const allFields = cache.inspectFields("Query");
-          const fieldInfos = allFields.filter(info => info.fieldName === "posts");
-          fieldInfos.forEach((fieldInfo) => {
-            // invalidate cache and refetch posts
-            cache.invalidate("Query", "posts", fieldInfo.arguments || {})
-          })
+          invalidateAllPosts(cache);
         },
         vote: (_result, args, cache, _info) => {
           // get type information

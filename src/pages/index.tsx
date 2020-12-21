@@ -11,10 +11,15 @@ import { urqlClient } from "../utils/urqlClient";
 
 const Index = () => {
   const [variables, setVariables] = useState({ limit: 10, cursor: null as null | string })
-  const [{ data, fetching, stale }] = usePostsQuery({ variables });
+  const [{ data, fetching, error, stale }] = usePostsQuery({ variables });
 
   if (!fetching && !data) {
-    return <div>Posts query wasn't able to retrieve the posts.</div>
+    return (
+      <div>
+        <div>Posts query wasn't able to retrieve the posts.</div>
+        {error?.message}
+      </div>
+    )
   }
 
   return (
